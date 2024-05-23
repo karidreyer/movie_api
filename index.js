@@ -5,44 +5,54 @@ const app = express();
 
 let topMovies = [
     {
-        title: '',
-        author: '',
+        title: 'Jeanne Dielman, 23 Quai du Commerce, 1080 Bruxelles',
+        director: '1975',
+        year: 'Chantal Akerman',
     },
     {
-        title: '',
-        author: '',
+        title: 'Vertigo',
+        director: 'Alfred Hitchcock',
+        year: '1958',
     },
     {
-        title: '',
-        author: '',
+        title: 'Citizen Kane',
+        director: 'Orson Welles',
+        year: '1941',
     },
     {
-        title: '',
-        author: '',
+        title: 'Tokyo Story',
+        director: 'Yasujirō Ozu',
+        year: '1953',
     },
     {
-        title: '',
-        author: '',
+        title: 'In the Mood for Love',
+        director: 'Wong Kar Wai',
+        year: '2000',
     },
     {
-        title: '',
-        author: '',
+        title: '2001: A Space Odyssey',
+        director: 'Stanley Kubrick',
+        year: '1968',
     },
     {
-        title: '',
-        author: '',
+        title: 'Beau travail',
+        director: '1998',
+        year: 'Claire Denis',
     },
     {
-        title: '',
-        author: '',
+        title: 'Mulholland Dr.',
+        director: 'David Lynch',
+        year: '2001',
     },
     {
-        title: '',
-        author: '',
+        title: 'Man with a Movie Camera',
+        director: 'Dziga Vertov',
+        year: '1929',
     },
     {
-        title: '',
-        author: '',
+        title: 'Singin\' in the Rain',
+        director: 'Gene Kelly',
+        year: '1951',
     },
 ]
 
