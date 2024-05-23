@@ -56,8 +56,11 @@ let topMovies = [
     },
 ]
 
-//Automatically route requests for static files via "public" folder - using Express
+//Express function - automatically route requests for static files via "public" folder
 app.use(express.static('public'));
+
+//Morgan function - use Morgan middleware for logging requests
+app.use(morgan('common'));
 
 //GET requests
 app.get('/', (req, res) => {
@@ -66,6 +69,12 @@ app.get('/', (req, res) => {
 
 app.get('/movies', (req, res) => {
     res.json(topMovies);
+});
+
+//Express function - error handling middleware function
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
 });
 
 
