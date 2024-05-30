@@ -143,7 +143,19 @@ app.get('/movies/directors/:directorName', (req, res) => {
 });
 
 //Endpoint 6: UPDATE - Allow users to update their user info (username, password, email, date of birth)
+app.put('/users/:id', (req, res) => {
+    const { id } = req.params; //"Object Destructuring"
+    const updatedUser = req.body;
 
+    let user = users.find( user => user.id == id);
+
+    if (user) {
+        user.name = updatedUser.name;
+        res.status(200).json(user);
+    } else {
+        res.status(400).send('User does not exist.')
+    }
+});
 
 //Endpoint 7: UPDATE - Allow users to add a movie to their list of favourites
 
