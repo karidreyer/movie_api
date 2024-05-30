@@ -4,6 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MovieNest API Documentation</title>
+
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
 </head>
 <body>
     <h1>MovieNest API Documentation</h1>
@@ -33,5 +48,130 @@
         <li><strong>Data Security Regulations</strong>: Meets data security regulations.</li>
         <li><strong>Deployment</strong>: Source code is deployed to GitHub and Heroku.</li>
     </ul>
+
+    <h2>API Endpoints</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Business Logic</th>
+                <th>URL</th>
+                <th>HTTP Method</th>
+                <th>Request Body Data Format</th>
+                <th>Response Body Data Format</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Return a list of all movies to the user</td>
+                <td>/movies</td>
+                <td>GET</td>
+                <td>None</td>
+                <td>A JSON object holding data about all movies.</td>
+            </tr>
+            <tr>
+                <td>Return data (description, genre, director, image URL, whether it’s featured or not) about a single movie by title to the user</td>
+                <td>/movies/[TITLE]</td>
+                <td>GET</td>
+                <td>None</td>
+                <td>
+                    <pre>{
+    "Title": "Vertigo",
+    "Description": "A former police detective juggles wrestling with his personal demons and becoming obsessed with a hauntingly beautiful woman.",
+    "Genre": {
+        "Name": "Thriller",
+        "Description": "..."
+    },
+    "Director": "Alfred Hitchcock",
+    "Year": "1958",
+    "ImageUrl": "https://example.com/vertigo.jpg"
+}</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>Return data about a genre (description) by name/title (e.g., “Thriller”)</td>
+                <td>/movies/genre/[GENRE]</td>
+                <td>GET</td>
+                <td>None</td>
+                <td>
+                    <pre>{
+    "Name": "Drama",
+    "Description": "..."
+}</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>Return data about a director (bio, birth year, death year) by name</td>
+                <td>/movies/directors/[DIRECTOR]</td>
+                <td>GET</td>
+                <td>None</td>
+                <td>
+                    <pre>{
+    "Name": "Orson Welles",
+    "Bio": "...",
+    "Birth": "...",
+    "Death": "..."
+}</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>Allow new users to register</td>
+                <td>/users</td>
+                <td>POST</td>
+                <td>
+                    <pre>{
+    "name": "Mary",
+    "favouriteMovies": []
+}</pre>
+                </td>
+                <td>
+                    <pre>{
+    "name": "Mary",
+    "favouriteMovies": [],
+    "id": "6af96dea-4a7f-4970-b8bc-b23e023e874f"
+}</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>Allow users to update their user info (username, password, email, date of birth)</td>
+                <td>/users/[ID]</td>
+                <td>PUT</td>
+                <td>
+                    <pre>{
+    "name": "Kim Updated Name",
+    "favouriteMovies": []
+}</pre>
+                </td>
+                <td>
+                    <pre>{
+    "id": 1,
+    "name": "Kim Updated Name",
+    "favouriteMovies": []
+}</pre>
+                </td>
+            </tr>
+            <tr>
+                <td>Allow users to add a movie to their list of favourites</td>
+                <td>/users/[ID]/[MOVIE]</td>
+                <td>POST</td>
+                <td>None</td>
+                <td>A text message indicating whether the movie was successfully added to the user’s list of favourites.</td>
+            </tr>
+            <tr>
+                <td>Allow users to remove a movie from their list of favourites</td>
+                <td>/users/[ID]/[MOVIE]</td>
+                <td>DELETE</td>
+                <td>None</td>
+                <td>A text message indicating whether the movie was successfully removed from a user’s list of favourites.</td>
+            </tr>
+            <tr>
+                <td>Allow existing users to deregister</td>
+                <td>/users/[ID]</td>
+                <td>DELETE</td>
+                <td>None</td>
+                <td>A text message indicating whether a user was successfully deregistered.</td>
+            </tr>
+        </tbody>
+    </table>
+
 </body>
 </html>

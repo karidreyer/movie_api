@@ -71,18 +71,17 @@ let movies = [
     },
 ];
 
-
-//GENERAL
-
-//Route requests for static files via "public" folder
-app.use(express.static('public'));
-
-//Log requests (using Morgan middleware)
+app.use(express.static('public')); //This serves static files from the public folder
 app.use(morgan('common'));
 
 //Stand-in homepage response
 app.get('/', (req, res) => {
     res.send('Welcome to Movie Nest!');
+});
+
+// Route to serve documentation.html
+app.get('/documentation', (req, res) => {
+    res.sendFile(__dirname + '/public/documentation.html');
 });
 
 
