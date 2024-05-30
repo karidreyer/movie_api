@@ -101,6 +101,20 @@ app.post('/users', (req, res) => {
     }
 });
 
+//Endpoint 7: CREATE - Allow users to add a movie to their list of favourites
+app.post('/users/:id/:movieTitle', (req, res) => {
+    const { id, movieTitle } = req.params; //"Object Destructuring"
+
+    let user = users.find( user => user.id == id);
+
+    if (user) {
+        user.favouriteMovies.push(movieTitle);
+        res.status(200).json(`${movieTitle} has been added to user ${id}'s array`);
+    } else {
+        res.status(400).send('User does not exist.')
+    }
+});
+
 //Endpoint 1: READ - Return a list of all movies to the user
 app.get('/movies', (req, res) => {
     res.status(200).json(movies);
@@ -157,11 +171,33 @@ app.put('/users/:id', (req, res) => {
     }
 });
 
-//Endpoint 7: UPDATE - Allow users to add a movie to their list of favourites
-
 //Endpoint 8: DELETE - Allow users to remove a movie from their list of favourites 
+app.delete('/users/:id/:movieTitle', (req, res) => {
+    const { id, movieTitle } = req.params; //"Object Destructuring"
+
+    let user = users.find( user => user.id == id);
+
+    if (user) {
+        user.favouriteMovies = user.favouriteMovies.filter( title => title !== movieTitle);
+        res.status(200).json(`${movieTitle} has been removed from user ${id}'s array.`);
+    } else {
+        res.status(400).send('User does not exist.')
+    }
+});
 
 //Endpoint 9: DELETE - Allow existing users to deregister 
+app.delete('/users/:id', (req, res) => {
+    const { id } = req.params; //"Object Destructuring"
+
+    let user = users.find( user => user.id == id);
+
+    if (user) {
+        users = users.filter( user => user.id != id);
+        res.status(200).json(`User ${id} has been deleted.`);
+    } else {
+        res.status(400).send('User does not exist.')
+    }
+});
 
 
 
