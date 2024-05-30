@@ -24,7 +24,10 @@ let movies = [
     {
         Title: 'Vertigo',
         Description: 'A former police detective juggles wrestling with his personal demons and becoming obsessed with a hauntingly beautiful woman.',
-        Genre: 'Mystery/Thriller',
+        Genre: {
+            Name: 'Thriller',
+            Description: "...",
+        },
         Director: 'Alfred Hitchcock',
         Year: '1958',
         ImageUrl: 'https://example.com/vertigo.jpg'
@@ -32,7 +35,10 @@ let movies = [
     {
         Title: 'Citizen Kane',
         Description: 'Following the death of publishing tycoon Charles Foster Kane, reporters scramble to uncover the meaning of his final utterance: "Rosebud."',
-        Genre: 'Drama',
+        Genre: {
+            Name: 'Drama',
+            Description: "...",
+        },
         Director: 'Orson Welles',
         Year: '1941',
         ImageUrl: 'https://example.com/citizen_kane.jpg'
@@ -40,7 +46,10 @@ let movies = [
     {
         Title: 'Tokyo Story',
         Description: 'An old couple visit their children and grandchildren in the city; but the children have little time for them.',
-        Genre: 'Drama',
+        Genre: {
+            Name: 'Drama',
+            Description: "...",
+        },
         Director: 'Yasujirō Ozu',
         Year: '1953',
         ImageUrl: 'https://example.com/tokyo_story.jpg'
@@ -72,7 +81,7 @@ app.get('/movies', (req, res) => {
 //Endpoint 2: Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not)
 app.get('/movies/:title', (req, res) => {
     const { title } = req.params; //Object Destructuring
-    const movie = movies.find( movie => movie.title === title );
+    const movie = movies.find( movie => movie.Title === title );
 
     if (movie) {
         res.status(200).json(movie);
@@ -81,8 +90,17 @@ app.get('/movies/:title', (req, res) => {
     }
 });
 
-
 //Endpoint 3: Return data about a genre (description) by name/title (e.g., “Thriller”) 
+app.get('/movies/genre/:genreName', (req, res) => {
+    const { genreName } = req.params; //Object Destructuring
+    const genre = movies.find( movie => movie.Genre.Name === genreName ).Genre;
+
+    if (genre) {
+        res.status(200).json(genre);
+    } else {
+        res.status(400).send('No such genre!')
+    }
+});
 
 //Endpoint 4: Return data about a director (bio, birth year, death year) by name
 
