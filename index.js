@@ -28,7 +28,12 @@ let movies = [
             Name: 'Thriller',
             Description: "...",
         },
-        Director: 'Alfred Hitchcock',
+        Director: {
+            Name: 'Alfred Hitchcock',
+            Bio: "...",
+            Birth: "...",
+            Death: "..."
+        },
         Year: '1958',
         ImageUrl: 'https://example.com/vertigo.jpg'
     },
@@ -39,7 +44,12 @@ let movies = [
             Name: 'Drama',
             Description: "...",
         },
-        Director: 'Orson Welles',
+        Director: {
+            Name: 'Orson Welles',
+            Bio: "...",
+            Birth: "...",
+            Death: "..."
+        },
         Year: '1941',
         ImageUrl: 'https://example.com/citizen_kane.jpg'
     },
@@ -50,7 +60,12 @@ let movies = [
             Name: 'Drama',
             Description: "...",
         },
-        Director: 'Yasujirō Ozu',
+        Director: {
+            Name: 'Yasujirō Ozu',
+            Bio: "...",
+            Birth: "...",
+            Death: "..."
+        },
         Year: '1953',
         ImageUrl: 'https://example.com/tokyo_story.jpg'
     },
@@ -73,14 +88,27 @@ app.get('/', (req, res) => {
 
 //ENDPOINTS
 
-//Endpoint 1: Return a list of all movies to the user
+//Endpoint 5: CREATE - Allow new users to register
+app.post('/users', (req, res) => {
+    const newUser = req.body;
+
+    if (newUser.name) {
+        newUser.id = uuid.v4();
+        users.push(newUser);
+        res.status(201).json(newUser);
+    } else {
+        res.status(400).send('User\'s name is required.')
+    }
+});
+
+//Endpoint 1: READ - Return a list of all movies to the user
 app.get('/movies', (req, res) => {
     res.status(200).json(movies);
 });
 
-//Endpoint 2: Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not)
+//Endpoint 2: READ - Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not)
 app.get('/movies/:title', (req, res) => {
-    const { title } = req.params; //Object Destructuring
+    const { title } = req.params; //"Object Destructuring"
     const movie = movies.find( movie => movie.Title === title );
 
     if (movie) {
@@ -90,9 +118,9 @@ app.get('/movies/:title', (req, res) => {
     }
 });
 
-//Endpoint 3: Return data about a genre (description) by name/title (e.g., “Thriller”) 
+//Endpoint 3: READ - Return data about a genre (description) by name/title (e.g., “Thriller”)
 app.get('/movies/genre/:genreName', (req, res) => {
-    const { genreName } = req.params; //Object Destructuring
+    const { genreName } = req.params; //"Object Destructuring"
     const genre = movies.find( movie => movie.Genre.Name === genreName ).Genre;
 
     if (genre) {
@@ -102,17 +130,26 @@ app.get('/movies/genre/:genreName', (req, res) => {
     }
 });
 
-//Endpoint 4: Return data about a director (bio, birth year, death year) by name
+//Endpoint 4: READ - Return data about a director (bio, birth year, death year) by name
+app.get('/movies/directors/:directorName', (req, res) => {
+    const { directorName } = req.params; //"Object Destructuring"
+    const director = movies.find( movie => movie.Director.Name === directorName ).Director;
 
-//Endpoint 5: Allow new users to register 
+    if (director) {
+        res.status(200).json(director);
+    } else {
+        res.status(400).send('No such Director!')
+    }
+});
 
-//Endpoint 6: Allow users to update their user info (username, password, email, date of birth) 
+//Endpoint 6: UPDATE - Allow users to update their user info (username, password, email, date of birth)
 
-//Endpoint 7: Allow users to add a movie to their list of favourites
 
-//Endpoint 8: Allow users to remove a movie from their list of favourites 
+//Endpoint 7: UPDATE - Allow users to add a movie to their list of favourites
 
-//Endpoint 9: Allow existing users to deregister 
+//Endpoint 8: DELETE - Allow users to remove a movie from their list of favourites 
+
+//Endpoint 9: DELETE - Allow existing users to deregister 
 
 
 
