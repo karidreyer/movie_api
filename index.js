@@ -1,9 +1,26 @@
 const express = require('express');
-morgan = require('morgan');
+    morgan = require('morgan');
+    bodyParser = require('body-parser');
+    uuid = require('uuid');
 
 const app = express();
 
-let topMovies = [
+app.use(bodyParser.json());
+
+let users = [
+    {
+        id: 1,
+        name: 'Kim',
+        favouriteMovies: []
+    },
+    {
+        id: 2,
+        name: 'Joe',
+        favouriteMovies: ['Citizen Kane']
+    },
+]
+
+let movies = [
     {
         title: 'Jeanne Dielman, 23 Quai du Commerce, 1080 Bruxelles',
         director: '1975',
@@ -68,7 +85,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/movies', (req, res) => {
-    res.json(topMovies);
+    res.json(movies);
 });
 
 //Express function - error handling middleware function
