@@ -96,16 +96,39 @@ app.get('/documentation', (req, res) => {
 //ENDPOINTS
 
 //Endpoint 5: CREATE - Allow new users to register
-app.post('/users', (req, res) => {
-    const newUser = req.body;
 
-    if (newUser.name) {
-        newUser.id = uuid.v4();
-        users.push(newUser);
-        res.status(201).json(newUser);
-    } else {
-        res.status(400).send('User\'s name is required.')
-    }
+/* Expects JSON in this format
+{
+  ID: Integer,
+  Username: String, (required)
+  Password: String, (required)
+  Email: String, (required)
+  Birthday: Date
+}*/
+
+app.post('/users', async (req, res) => {
+    await Users.findOne({ Username: req.body.Username })
+    .then((user) => {
+        if (user) {
+            return res.status(400).send(req.body.Username + ' already exists.');
+        } else {
+            Users.create({
+                Username: req.body.Username,
+                Password: req.body.Password,
+                Email: req.body.Email,
+                Birthday: req.body.Birthday
+            })
+            .then((user) => { res.status(201).json(user) })
+            .catch((error) => {
+                console.error(error);
+                res.status(500).send('Error: ' + error);
+            })
+        }
+    })
+    .catch((error) => {
+        console.error(error);
+        res.status(500).send('Error: ' + error);
+    });
 });
 
 //Endpoint 7: CREATE - Allow users to add a movie to their list of favourites
