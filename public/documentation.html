@@ -118,6 +118,7 @@
                 <td>/users</td>
                 <td>POST</td>
                 <td>
+                    <p>A JSON object holding data about the student to add, structured accordingly:</p>
                     <pre>{
                         "Username": "TestUser",
                         "Password": "testuserpw",
@@ -126,6 +127,7 @@
                       }</pre>
                 </td>
                 <td>
+                    <p>A JSON object holding data about the newly registered user, including their name, any favourite movies given, and their ID.</p>
                     <pre>{
                         "Username": "TestUser",
                         "Password": "testuserpw",
@@ -176,6 +178,29 @@
                 <td>None</td>
                 <td>A text message indicating whether a user was successfully deregistered.</td>
             </tr>
+            <tr>
+                <td>Allow users to add a movie to their list of favourites</td>
+                <td>/users/[ID]/[MOVIE]</td>
+                <td>POST</td>
+                <td>None</td>
+                <td>A text message indicating whether the movie was successfully added to the user’s list of favourites.</td>
+            </tr>
+            <tr>
+                <td>Allow users to remove a movie from their list of favourites</td>
+                <td>/users/[ID]/[MOVIE]</td>
+                <td>DELETE</td>
+                <td>None</td>
+                <td>A text message indicating whether the movie was successfully removed from a user’s list of favourites.</td>
+            </tr>
+            <tr>
+                <td>Return a list of all Users</td>
+                <td>/users</td>
+                <td>GET</td>
+                <td>None</td>
+                <td>A JSON object holding data about all users.</td>
+            </tr>
+            
+            
         </tbody>
     </table>
 

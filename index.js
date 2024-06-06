@@ -176,8 +176,28 @@ app.get('/movies/directors/:directorName', (req, res) => {
 });
 
 //(10)READ - Return a list of all Users
+app.get('/users', async (req, res) => {
+    await Users.find()
+    .then((users) => {
+        res.status(201).json(users);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
+});
 
 //(11)READ - Return information about a single user by Username
+app.get('/users/:Username', async (req, res) => {
+    await Users.findOne({ Username: req.params.Username })
+    .then((user) => {
+        res.json(user);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
+});
 
 //(6)UPDATE - Allow users to update their user info (username, password, email, date of birth) ("/users/[USER ID]")
 app.put('/users/:id', (req, res) => {
