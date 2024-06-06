@@ -82,30 +82,19 @@ let movies = [
 app.use(express.static('public')); //This serves static files from the public folder
 app.use(morgan('common'));
 
-//Stand-in homepage response
+//ENDPOINTS//
+
+// Route to homepage ("/")
 app.get('/', (req, res) => {
     res.send('Welcome to Movie Nest!');
 });
 
-// Route to serve documentation.html
+// Route to documentation page about the API ("/documentation")
 app.get('/documentation', (req, res) => {
     res.sendFile(__dirname + '/public/documentation.html');
 });
 
-
-//ENDPOINTS
-
-//Endpoint 5: CREATE - Allow new users to register
-
-/* Expects JSON in this format
-{
-  ID: Integer,
-  Username: String, (required)
-  Password: String, (required)
-  Email: String, (required)
-  Birthday: Date
-}*/
-
+//(5)CREATE - Allow new users to register ("/users")
 app.post('/users', async (req, res) => {
     await Users.findOne({ Username: req.body.Username })
     .then((user) => {
@@ -131,7 +120,7 @@ app.post('/users', async (req, res) => {
     });
 });
 
-//Endpoint 7: CREATE - Allow users to add a movie to their list of favourites
+//(7)CREATE - Allow users to add a movie to their list of favourites ("/users/[USER ID]/[MOVIE TITLE]")
 app.post('/users/:id/:movieTitle', (req, res) => {
     const { id, movieTitle } = req.params; //"Object Destructuring"
 
@@ -145,12 +134,12 @@ app.post('/users/:id/:movieTitle', (req, res) => {
     }
 });
 
-//Endpoint 1: READ - Return a list of all movies to the user
+//(1)READ - Return a list of all movies to the user ("/movies")
 app.get('/movies', (req, res) => {
     res.status(200).json(movies);
 });
 
-//Endpoint 2: READ - Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not)
+//(2)READ - Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not) ("/movies/[MOVIE TITLE]")
 app.get('/movies/:title', (req, res) => {
     const { title } = req.params; //"Object Destructuring"
     const movie = movies.find( movie => movie.Title === title );
@@ -162,7 +151,7 @@ app.get('/movies/:title', (req, res) => {
     }
 });
 
-//Endpoint 3: READ - Return data about a genre (description) by name/title (e.g., “Thriller”)
+//(3)READ - Return data about a genre (description) by name/title (e.g., “Thriller”) ("/movies/genre/[GENRE NAME]")
 app.get('/movies/genre/:genreName', (req, res) => {
     const { genreName } = req.params; //"Object Destructuring"
     const genre = movies.find( movie => movie.Genre.Name === genreName ).Genre;
@@ -174,7 +163,7 @@ app.get('/movies/genre/:genreName', (req, res) => {
     }
 });
 
-//Endpoint 4: READ - Return data about a director (bio, birth year, death year) by name
+//(4)READ - Return data about a director (bio, birth year, death year) by name ("/movies/directors/[DIRECTOR NAME]")
 app.get('/movies/directors/:directorName', (req, res) => {
     const { directorName } = req.params; //"Object Destructuring"
     const director = movies.find( movie => movie.Director.Name === directorName ).Director;
@@ -186,7 +175,11 @@ app.get('/movies/directors/:directorName', (req, res) => {
     }
 });
 
-//Endpoint 6: UPDATE - Allow users to update their user info (username, password, email, date of birth)
+//(10)READ - Return a list of all Users
+
+//(11)READ - Return information about a single user by Username
+
+//(6)UPDATE - Allow users to update their user info (username, password, email, date of birth) ("/users/[USER ID]")
 app.put('/users/:id', (req, res) => {
     const { id } = req.params; //"Object Destructuring"
     const updatedUser = req.body;
@@ -201,7 +194,7 @@ app.put('/users/:id', (req, res) => {
     }
 });
 
-//Endpoint 8: DELETE - Allow users to remove a movie from their list of favourites 
+//(8)DELETE - Allow users to remove a movie from their list of favourites ("/users/[USER ID]/[MOVIE TITLE]")
 app.delete('/users/:id/:movieTitle', (req, res) => {
     const { id, movieTitle } = req.params; //"Object Destructuring"
 
@@ -215,7 +208,7 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
     }
 });
 
-//Endpoint 9: DELETE - Allow existing users to deregister 
+//(9)DELETE - Allow existing users to deregister 
 app.delete('/users/:id', (req, res) => {
     const { id } = req.params; //"Object Destructuring"
 
@@ -228,6 +221,7 @@ app.delete('/users/:id', (req, res) => {
         res.status(400).send('User does not exist.')
     }
 });
+
 
 
 
