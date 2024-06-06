@@ -1,25 +1,45 @@
-//Require the necessary modules
-const mongoose = require('mongoose');
-const Models = require('./models.js');
+//** Importing required modules and models **//
 
+//Import Mongoose for MongoDB interactions
+const mongoose = require('mongoose');
+
+//Import models
+const Models = require('./models.js');
 const Movies = Models.Movie;
 const Users = Models.User;
 
-mongoose.connect('mongodb://localhost:27017/cfDB');
-
+//Import Express framework and other necessary middleware
 const express = require('express');
-    morgan = require('morgan');
-    bodyParser = require('body-parser');
-    uuid = require('uuid');
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const uuid = require('uuid');
 
 
+
+//** Initializing Express application **//
 const app = express();
 
+
+
+//** Connect to MongoDB database **//
+mongoose.connect('mongodb://localhost:27017/cfDB');
+
+
+
+//** Middleware Setup **//
+
+//Parse incoming request bodies in a middleware before your handlers, available under the req.body property
 app.use(bodyParser.json());
-app.use(express.static('public')); //This serves static files from the public folder
+
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+
+// Log HTTP requests and errors, and simplify debugging
 app.use(morgan('common'));
 
-//ENDPOINTS//
+
+
+//** Routes and handlers **//
 
 // Route to homepage ("/")
 app.get('/', (req, res) => {
@@ -213,14 +233,16 @@ app.delete('/users/:Username', async (req, res) => {
 });
 
 
-//Error Handling Function
+
+//** Handling Errors **//
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
 });
 
 
-//Listen for requests
+
+//** Setting the application to listen on a specific port **//
 app.listen(8080, () => {
     console.log('Your app is listening on port 8080.');
 });
