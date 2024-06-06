@@ -82,15 +82,15 @@ app.get('/movies', async (req, res) => {
 });
 
 //(2)READ - Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not) ("/movies/[MOVIE TITLE]")
-app.get('/movies/:title', (req, res) => {
-    const { title } = req.params; //"Object Destructuring"
-    const movie = movies.find( movie => movie.Title === title );
-
-    if (movie) {
-        res.status(200).json(movie);
-    } else {
-        res.status(400).send('No such movie!')
-    }
+app.get('/movies/:Title', async (req, res) => {
+    await Movies.findOne({ Title: req.params.Title })
+    .then((movie) => {
+        res.json(movie);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
 });
 
 //(3)READ - Return data about a genre (description) by name/title (e.g., “Thriller”) ("/movies/genre/[GENRE NAME]")
