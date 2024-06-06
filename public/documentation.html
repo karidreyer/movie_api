@@ -69,48 +69,64 @@
                 <td>A JSON object holding data about all movies.</td>
             </tr>
             <tr>
-                <td>Return data (description, genre, director, image URL, whether it’s featured or not) about a single movie by title to the user</td>
-                <td>/movies/[TITLE]</td>
+                <td>Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not)</td>
+                <td>/movies/[MOVIE TITLE]</td>
                 <td>GET</td>
                 <td>None</td>
                 <td>
+                    <p>A JSON object holding data about a single movie, containing a title, description, genre, director, year, and image URL.<br>
+                    Example:<br>
+                    </p>
                     <pre>{
-    "Title": "Vertigo",
-    "Description": "A former police detective juggles wrestling with his personal demons and becoming obsessed with a hauntingly beautiful woman.",
-    "Genre": {
-        "Name": "Thriller",
-        "Description": "..."
-    },
-    "Director": "Alfred Hitchcock",
-    "Year": "1958",
-    "ImageUrl": "https://example.com/vertigo.jpg"
-}</pre>
+                        "Genre": {
+                               "Name": "Adventure",
+                               "Description": "Movies that involve exploration, travel, and exciting journeys, often set in exotic locations. They usually include a quest or mission."
+                           },
+                           "Director": {
+                               "Name": "Greta Gerwig",
+                               "Bio": "Greta Gerwig is an American actress, screenwriter, and director. She has collaborated with Noah Baumbach on several films and is known for her directorial work on Lady Bird, Little Women, and Barbie.",
+                               "Birth": "1983",
+                               "Death": ""
+                           },
+                           "Actors": [],
+                           "_id": "665ef9629dddec05c68fcd0d",
+                           "Title": "Barbie",
+                           "Description": "Barbie and Ken are having the time of their lives in the colorful and seemingly perfect world of Barbie Land. However, they soon discover the joys and perils of living among humans.",
+                           "ImagePath": "barbie.png",
+                           "Featured": true
+                       }</pre>
                 </td>
             </tr>
             <tr>
-                <td>Return data about a genre (description) by name/title (e.g., “Thriller”)</td>
-                <td>/movies/genre/[GENRE]</td>
+                <td>Return data about a genre (description) by genre name (e.g., “Drama”)</td>
+                <td>/movies/genres/[GENRE NAME]</td>
                 <td>GET</td>
                 <td>None</td>
                 <td>
-                    <pre>{
-    "Name": "Drama",
-    "Description": "..."
-}</pre>
+                    <p>A JSON object holding data about a single genre, containing a name and description.<br>
+                        Example:<br>
+                        </p>
+                        <pre>{
+                            "Name": "Drama",
+                               "Description": "Stories with serious, emotional, and often real-life situations. They focus on character development and narrative, often dealing with complex issues."
+                           }</pre>
                 </td>
             </tr>
             <tr>
                 <td>Return data about a director (bio, birth year, death year) by name</td>
-                <td>/movies/directors/[DIRECTOR]</td>
+                <td>/movies/directors/[DIRECTOR NAME]</td>
                 <td>GET</td>
                 <td>None</td>
                 <td>
-                    <pre>{
-    "Name": "Orson Welles",
-    "Bio": "...",
-    "Birth": "...",
-    "Death": "..."
-}</pre>
+                    <p>A JSON object holding data about a single director, containing their name, bio, year of birth, and year of death.<br>
+                        Example:<br>
+                        </p>
+                        <pre>{
+                            "Name": "Greta Gerwig",
+                               "Bio": "Greta Gerwig is an American actress, screenwriter, and director. She has collaborated with Noah Baumbach on several films and is known for her directorial work on Lady Bird, Little Women, and Barbie.",
+                               "Birth": "1983",
+                               "Death": ""
+                           }</pre>
                 </td>
             </tr>
             <tr>
@@ -141,56 +157,87 @@
             </tr>
             <tr>
                 <td>Allow users to update their user info (username, password, email, date of birth)</td>
-                <td>/users/[ID]</td>
+                <td>/users/[USERNAME]</td>
                 <td>PUT</td>
                 <td>
+                    <p>A JSON object holding data about the information to update, structured accordingly:</p>
                     <pre>{
-    "name": "Kim Updated Name",
-    "favouriteMovies": []
-}</pre>
+                        "Username": "TestUser",
+                        "Password": "testuserpw",
+                        "Email": "testuser@example.com",
+                        "BirthDate": "2000-11-11"
+                      }</pre>
                 </td>
                 <td>
-                    <pre>{
-    "id": 1,
-    "name": "Kim Updated Name",
-    "favouriteMovies": []
-}</pre>
+                    <p>A JSON object holding the updated data about the user, including their name, current favourite movies, and their ID.<br>
+                        Example:<br>
+                        </p>
+                        <pre>{
+                            "_id": "665f02b69dddec05c68fcd17",
+                               "Username": "TestUser",
+                               "Password": "newpw",
+                               "Email": "testuser@example.com",
+                               "BirthDate": "2000-11-11T00:00:00.000Z",
+                               "FavouriteMovies": [
+                                   "665ef9629dddec05c68fcd0d",
+                                   "665efb289dddec05c68fcd0f",
+                                   "665efbd49dddec05c68fcd15"
+                               ]
+                           }</pre>
                 </td>
             </tr>
             <tr>
                 <td>Allow users to add a movie to their list of favourites</td>
-                <td>/users/[ID]/[MOVIE]</td>
+                <td>/users/[USERNAME]/[MOVIE ID]</td>
                 <td>POST</td>
                 <td>None</td>
-                <td>A text message indicating whether the movie was successfully added to the user’s list of favourites.</td>
+                <td>
+                    <p>A JSON object holding the updated data about the user, including their name, current favourite movies, and their ID.<br>
+                        Example:<br>
+                        </p>
+                        <pre>{
+                            "_id": "665f02b69dddec05c68fcd17",
+                            "Username": "TestUser",
+                            "Password": "newpw",
+                            "Email": "testuser@example.com",
+                            "BirthDate": "2000-11-11T00:00:00.000Z",
+                            "FavouriteMovies": [
+                                "665ef9629dddec05c68fcd0d",
+                                "665efb289dddec05c68fcd0f",
+                                "665efbd49dddec05c68fcd15"
+                            ]
+                        }</pre>
+                </td>
             </tr>
             <tr>
                 <td>Allow users to remove a movie from their list of favourites</td>
-                <td>/users/[ID]/[MOVIE]</td>
+                <td>/users/[USERNAME]/[MOVIE ID]</td>
                 <td>DELETE</td>
                 <td>None</td>
-                <td>A text message indicating whether the movie was successfully removed from a user’s list of favourites.</td>
+                <td>
+                    <p>A JSON object holding the updated data about the user, including their name, current favourite movies, and their ID.<br>
+                        Example:<br>
+                        </p>
+                        <pre>{
+                            "_id": "665f02b69dddec05c68fcd17",
+                            "Username": "TestUser",
+                            "Password": "newpw",
+                            "Email": "testuser@example.com",
+                            "BirthDate": "2000-11-11T00:00:00.000Z",
+                            "FavouriteMovies": [
+                                "665ef9629dddec05c68fcd0d",
+                                "665efb289dddec05c68fcd0f",
+                                "665efbd49dddec05c68fcd15"
+                            ]
+                        }</pre>
+                </td>
             </tr>
             <tr>
                 <td>Allow existing users to deregister</td>
-                <td>/users/[ID]</td>
+                <td>/users/[USERNAME]</td>
                 <td>DELETE</td>
                 <td>None</td>
                 <td>A text message indicating whether a user was successfully deregistered.</td>
-            </tr>
-            <tr>
-                <td>Allow users to add a movie to their list of favourites</td>
-                <td>/users/[ID]/[MOVIE]</td>
-                <td>POST</td>
-                <td>None</td>
-                <td>A text message indicating whether the movie was successfully added to the user’s list of favourites.</td>
-            </tr>
-            <tr>
-                <td>Allow users to remove a movie from their list of favourites</td>
-                <td>/users/[ID]/[MOVIE]</td>
-                <td>DELETE</td>
-                <td>None</td>
-                <td>A text message indicating whether the movie was successfully removed from a user’s list of favourites.</td>
             </tr>
             <tr>
                 <td>Return a list of all Users</td>
@@ -198,6 +245,30 @@
                 <td>GET</td>
                 <td>None</td>
                 <td>A JSON object holding data about all users.</td>
+            </tr>
+            <tr>
+                <td>Return data about a single user by Username</td>
+                <td>/users/[USERNAME]</td>
+                <td>GET</td>
+                <td>None</td>
+                <td>
+                    <p>A JSON object holding data about a single user, containing their Username, Password, Email, Birthday, and Favourite Movies.
+                        <br>
+                        Example:<br>
+                        </p>
+                        <pre>{
+                            "_id": "665f02b69dddec05c68fcd17",
+                            "Username": "TestUser",
+                            "Password": "newpw",
+                            "Email": "testuser@example.com",
+                            "BirthDate": "2000-11-11T00:00:00.000Z",
+                            "FavouriteMovies": [
+                                "665ef9629dddec05c68fcd0d",
+                                "665efb289dddec05c68fcd0f",
+                                "665efbd49dddec05c68fcd15"
+                            ]
+                        }</pre>
+                </td>
             </tr>
             
             
