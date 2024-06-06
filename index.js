@@ -1,3 +1,4 @@
+//Require the necessary modules
 const mongoose = require('mongoose');
 const Models = require('./models.js');
 
@@ -10,6 +11,7 @@ const express = require('express');
     morgan = require('morgan');
     bodyParser = require('body-parser');
     uuid = require('uuid');
+
 
 const app = express();
 
@@ -30,6 +32,13 @@ app.get('/documentation', (req, res) => {
 });
 
 //(5)CREATE - Allow new users to register ("/users")
+/* JSON data input is expected in this format
+{
+  Username: String, (required)
+  Password: String, (required)
+  Email: String, (required)
+  Birthday: Date
+}*/
 app.post('/users', async (req, res) => {
     await Users.findOne({ Username: req.body.Username })
     .then((user) => {
@@ -55,18 +64,20 @@ app.post('/users', async (req, res) => {
     });
 });
 
-//(7)CREATE - Allow users to add a movie to their list of favourites ("/users/[USER ID]/[MOVIE TITLE]")
-app.post('/users/:id/:movieTitle', (req, res) => {
-    const { id, movieTitle } = req.params; //"Object Destructuring"
-
-    let user = users.find( user => user.id == id);
-
-    if (user) {
-        user.favouriteMovies.push(movieTitle);
-        res.status(200).json(`${movieTitle} has been added to user ${id}'s array`);
-    } else {
-        res.status(400).send('User does not exist.')
-    }
+//(7)CREATE - Allow users to add a movie to their list of favourites ("/users/[USERNAME]/[MOVIE ID]")
+app.post('/users/:Username/movies/:MovieID', async (req, res) => {
+    await Users.findOneAndUpdate({ Username: req.params.Username }, 
+        { $addToSet: 
+            { FavouriteMovies: req.params.MovieID },
+        },
+        { new: true }) // This line makes sure that the /updated/ document is returned
+        .then((updatedUser) => {
+            res.json(updatedUser);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
 });
 
 //(1)READ - Return a list of all movies to the user ("/movies")
@@ -93,28 +104,28 @@ app.get('/movies/:Title', async (req, res) => {
     });
 });
 
-//(3)READ - Return data about a genre (description) by name/title (e.g., “Thriller”) ("/movies/genre/[GENRE NAME]")
-app.get('/movies/genre/:genreName', (req, res) => {
-    const { genreName } = req.params; //"Object Destructuring"
-    const genre = movies.find( movie => movie.Genre.Name === genreName ).Genre;
-
-    if (genre) {
-        res.status(200).json(genre);
-    } else {
-        res.status(400).send('No such genre!')
-    }
+//(3)READ - Return data about a genre (description) by name/title (e.g., “Thriller”) ("/movies/genres/[GENRE NAME]")
+app.get('/movies/genres/:GenreName', async (req, res) => {
+    await Movies.findOne({ "Genre.Name": req.params.GenreName })
+    .then((movie) => {
+        res.json(movie.Genre);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
 });
 
 //(4)READ - Return data about a director (bio, birth year, death year) by name ("/movies/directors/[DIRECTOR NAME]")
-app.get('/movies/directors/:directorName', (req, res) => {
-    const { directorName } = req.params; //"Object Destructuring"
-    const director = movies.find( movie => movie.Director.Name === directorName ).Director;
-
-    if (director) {
-        res.status(200).json(director);
-    } else {
-        res.status(400).send('No such Director!')
-    }
+app.get('/movies/directors/:DirectorName', async (req, res) => {
+    await Movies.findOne({ "Director.Name": req.params.DirectorName })
+    .then((movie) => {
+        res.json(movie.Director);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
 });
 
 //(10)READ - Return a list of all Users
@@ -141,50 +152,65 @@ app.get('/users/:Username', async (req, res) => {
     });
 });
 
-//(6)UPDATE - Allow users to update their user info (username, password, email, date of birth) ("/users/[USER ID]")
-app.put('/users/:id', (req, res) => {
-    const { id } = req.params; //"Object Destructuring"
-    const updatedUser = req.body;
-
-    let user = users.find( user => user.id == id);
-
-    if (user) {
-        user.name = updatedUser.name;
-        res.status(200).json(user);
-    } else {
-        res.status(400).send('User does not exist.')
-    }
+//(6)UPDATE - Allow users to update their user info (username, password, email, date of birth) ("/users/[USERNAME]")
+/* JSON data input is expected in this format
+{
+  Username: String, (required)
+  Password: String, (required)
+  Email: String, (required)
+  Birthday: Date
+}*/
+app.put('/users/:Username', async (req, res) => {
+    await Users.findOneAndUpdate({ Username: req.params.Username },
+        { $set: 
+            {
+                Username: req.body.Username,
+                Password: req.body.Password,
+                Email: req.body.Email,
+                BirthDate: req.body.Birth
+            },
+        },
+        { new: true }) // This line makes sure thast the /updated/ document is returned
+        .then((updatedUser) => {
+            res.json(updatedUser);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        })
 });
 
-//(8)DELETE - Allow users to remove a movie from their list of favourites ("/users/[USER ID]/[MOVIE TITLE]")
-app.delete('/users/:id/:movieTitle', (req, res) => {
-    const { id, movieTitle } = req.params; //"Object Destructuring"
-
-    let user = users.find( user => user.id == id);
-
-    if (user) {
-        user.favouriteMovies = user.favouriteMovies.filter( title => title !== movieTitle);
-        res.status(200).json(`${movieTitle} has been removed from user ${id}'s array.`);
-    } else {
-        res.status(400).send('User does not exist.')
-    }
+//(8)DELETE - Allow users to remove a movie from their list of favourites ("/users/[USERNAME]/[MOVIE ID]")
+app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
+    await Users.findOneAndUpdate({ Username: req.params.Username }, 
+        { $pull: 
+            { FavouriteMovies: req.params.MovieID },
+        },
+        { new: true }) // This line makes sure that the /updated/ document is returned
+        .then((updatedUser) => {
+            res.json(updatedUser);
+        })
+        .catch((err) => {
+            console.error(err);
+            res.status(500).send('Error: ' + err);
+        });
 });
 
 //(9)DELETE - Allow existing users to deregister 
-app.delete('/users/:id', (req, res) => {
-    const { id } = req.params; //"Object Destructuring"
-
-    let user = users.find( user => user.id == id);
-
-    if (user) {
-        users = users.filter( user => user.id != id);
-        res.status(200).json(`User ${id} has been deleted.`);
-    } else {
-        res.status(400).send('User does not exist.')
-    }
+app.delete('/users/:Username', async (req, res) => {
+    await Users.findOneAndDelete({ Username: req.params.Username })
+    .then((user) => {
+        if (!user) {
+            res.status(400).send(req.params.Username + ' was not found.');
+        } else {
+            res.status(200).send(req.params.Username + ' was deleted.');
+        }
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
 });
-
-
 
 
 //Error Handling Function
