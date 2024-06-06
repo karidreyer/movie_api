@@ -70,10 +70,6 @@ app.post('/users/:id/:movieTitle', (req, res) => {
 });
 
 //(1)READ - Return a list of all movies to the user ("/movies")
-// app.get('/movies', (req, res) => {
-//     res.status(200).json(movies);
-// });
-
 app.get('/movies', async (req, res) => {
     await Movies.find()
     .then((movies) => {
