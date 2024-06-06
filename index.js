@@ -14,71 +14,6 @@ const express = require('express');
 const app = express();
 
 app.use(bodyParser.json());
-
-let users = [
-    {
-        id: 1,
-        name: 'Kim',
-        favouriteMovies: []
-    },
-    {
-        id: 2,
-        name: 'Joe',
-        favouriteMovies: ['Citizen Kane']
-    },
-]
-
-let movies = [
-    {
-        Title: 'Vertigo',
-        Description: 'A former police detective juggles wrestling with his personal demons and becoming obsessed with a hauntingly beautiful woman.',
-        Genre: {
-            Name: 'Thriller',
-            Description: "...",
-        },
-        Director: {
-            Name: 'Alfred Hitchcock',
-            Bio: "...",
-            Birth: "...",
-            Death: "..."
-        },
-        Year: '1958',
-        ImageUrl: 'https://example.com/vertigo.jpg'
-    },
-    {
-        Title: 'Citizen Kane',
-        Description: 'Following the death of publishing tycoon Charles Foster Kane, reporters scramble to uncover the meaning of his final utterance: "Rosebud."',
-        Genre: {
-            Name: 'Drama',
-            Description: "...",
-        },
-        Director: {
-            Name: 'Orson Welles',
-            Bio: "...",
-            Birth: "...",
-            Death: "..."
-        },
-        Year: '1941',
-        ImageUrl: 'https://example.com/citizen_kane.jpg'
-    },
-    {
-        Title: 'Tokyo Story',
-        Description: 'An old couple visit their children and grandchildren in the city; but the children have little time for them.',
-        Genre: {
-            Name: 'Drama',
-            Description: "...",
-        },
-        Director: {
-            Name: 'Yasujirō Ozu',
-            Bio: "...",
-            Birth: "...",
-            Death: "..."
-        },
-        Year: '1953',
-        ImageUrl: 'https://example.com/tokyo_story.jpg'
-    },
-];
-
 app.use(express.static('public')); //This serves static files from the public folder
 app.use(morgan('common'));
 
@@ -135,8 +70,19 @@ app.post('/users/:id/:movieTitle', (req, res) => {
 });
 
 //(1)READ - Return a list of all movies to the user ("/movies")
-app.get('/movies', (req, res) => {
-    res.status(200).json(movies);
+// app.get('/movies', (req, res) => {
+//     res.status(200).json(movies);
+// });
+
+app.get('/movies', async (req, res) => {
+    await Movies.find()
+    .then((movies) => {
+        res.status(201).json(movies);
+    })
+    .catch((err) => {
+        console.error(err);
+        res.status(500).send('Error: ' + err);
+    });
 });
 
 //(2)READ - Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not) ("/movies/[MOVIE TITLE]")
