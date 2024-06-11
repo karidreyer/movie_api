@@ -96,7 +96,10 @@ app.post('/users', async (req, res) => {
 });
 
 //(7)CREATE - Allow users to add a movie to their list of favourites ("/users/[USERNAME]/[MOVIE ID]")
-app.post('/users/:Username/movies/:MovieID', async (req, res) => {
+app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
+        return res.status(400).send('Permission denied.');
+    }
     await Users.findOneAndUpdate({ Username: req.params.Username }, 
         { $addToSet: 
             { FavouriteMovies: req.params.MovieID },
@@ -124,7 +127,7 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), async (req,
 });
 
 //(2)READ - Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not) ("/movies/[MOVIE TITLE]")
-app.get('/movies/:Title', async (req, res) => {
+app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Movies.findOne({ Title: req.params.Title })
     .then((movie) => {
         res.json(movie);
@@ -136,7 +139,7 @@ app.get('/movies/:Title', async (req, res) => {
 });
 
 //(3)READ - Return data about a genre (description) by name/title (e.g., “Thriller”) ("/movies/genres/[GENRE NAME]")
-app.get('/movies/genres/:GenreName', async (req, res) => {
+app.get('/movies/genres/:GenreName', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Movies.findOne({ "Genre.Name": req.params.GenreName })
     .then((movie) => {
         res.json(movie.Genre);
@@ -148,7 +151,7 @@ app.get('/movies/genres/:GenreName', async (req, res) => {
 });
 
 //(4)READ - Return data about a director (bio, birth year, death year) by name ("/movies/directors/[DIRECTOR NAME]")
-app.get('/movies/directors/:DirectorName', async (req, res) => {
+app.get('/movies/directors/:DirectorName', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Movies.findOne({ "Director.Name": req.params.DirectorName })
     .then((movie) => {
         res.json(movie.Director);
@@ -191,7 +194,10 @@ app.get('/users/:Username', async (req, res) => {
   Email: String, (required)
   Birthday: Date
 }*/
-app.put('/users/:Username', async (req, res) => {
+app.put('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
+        return res.status(400).send('Permission denied.');
+    }
     await Users.findOneAndUpdate({ Username: req.params.Username },
         { $set: 
             {
@@ -212,7 +218,10 @@ app.put('/users/:Username', async (req, res) => {
 });
 
 //(8)DELETE - Allow users to remove a movie from their list of favourites ("/users/[USERNAME]/[MOVIE ID]")
-app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
+app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
+        return res.status(400).send('Permission denied.');
+    }
     await Users.findOneAndUpdate({ Username: req.params.Username }, 
         { $pull: 
             { FavouriteMovies: req.params.MovieID },
@@ -228,7 +237,10 @@ app.delete('/users/:Username/movies/:MovieID', async (req, res) => {
 });
 
 //(9)DELETE - Allow existing users to deregister 
-app.delete('/users/:Username', async (req, res) => {
+app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
+        return res.status(400).send('Permission denied.');
+    }
     await Users.findOneAndDelete({ Username: req.params.Username })
     .then((user) => {
         if (!user) {
