@@ -39,6 +39,17 @@ app.use(morgan('common'));
 
 
 
+//** Authorization **//
+
+//Import "auth.js"
+let auth = require('./auth')(app); 
+
+//Require Passport module and import the "passport.js" file
+const passport = require('passport');
+require('./passport');
+
+
+
 //** Routes and handlers **//
 
 // Route to homepage ("/")
