@@ -86,14 +86,15 @@ app.get('/documentation', (req, res) => {
   Birthday: Date
 }*/
 app.post('/users', async (req, res) => {
-    await Users.findOne({ Username: req.body.Username })
+    let hashedPassword = Users.hashPassword(req.body.Password); //Take the password and hashes it
+    await Users.findOne({ Username: req.body.Username }) //First, search for the requested username to check if it already exists
     .then((user) => {
         if (user) {
-            return res.status(400).send(req.body.Username + ' already exists.');
+            return res.status(400).send(req.body.Username + ' already exists.'); //If requested username already exists, notify the user
         } else {
             Users.create({
                 Username: req.body.Username,
-                Password: req.body.Password,
+                Password: hashedPassword, //Store only hashed password for privacy
                 Email: req.body.Email,
                 BirthDate: req.body.BirthDate
             })
