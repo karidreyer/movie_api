@@ -88,7 +88,7 @@ app.get('/documentation', (req, res) => {
 }*/
 app.post('/users', [
     //Input validation via Express Validation
-    check('Username', 'Username is required.').isLength({min: 5}), //Check that username is not empty or too short
+    check('Username', 'Username must be at least 5 characters long.').isLength({min: 5}), //Check that username is not empty or too short
     check('Username', 'Username can not contain non-alphanumeric characters.').isAlphanumeric(), //Check that username does not contain non-alphanumeric characters
     check('Password', 'Password is required.').not().isEmpty(), //Check that password is not empty
     check('Email', 'Email does not appear to be valid.').isEmail() //Check that email address is valid
