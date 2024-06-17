@@ -99,8 +99,11 @@ app.post('/users', [
         return res.status(422).json({ errors: errors.array() });
     }
 
-    let hashedPassword = Users.hashPassword(req.body.Password); //Take the password and hash it
-    await Users.findOne({ Username: req.body.Username }) //First, search for the requested username to check if it already exists
+    //Take the password input and hash it
+    let hashedPassword = Users.hashPassword(req.body.Password);
+
+    //Search for the requested username to check if it already exists
+    await Users.findOne({ Username: req.body.Username })
     .then((user) => {
         if (user) {
             return res.status(400).send(req.body.Username + ' already exists.'); //If requested username already exists, notify the user
@@ -223,15 +226,30 @@ app.get('/users/:Username', async (req, res) => {
   Email: String, (required)
   Birthday: Date
 }*/
-app.put('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
-    if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
+app.put('/users/:Username', passport.authenticate('jwt', { session: false }), [
+    //Input validation via Express Validation
+    check('Username', 'Username must be at least 5 characters long.').isLength({min: 5}), //Check that username is not empty or too short
+    check('Username', 'Username can not contain non-alphanumeric characters.').isAlphanumeric(), //Check that username does not contain non-alphanumeric characters
+    check('Password', 'Password is required.').not().isEmpty(), //Check that password is not empty
+    check('Email', 'Email does not appear to be valid.').isEmail() //Check that email address is valid
+], async (req, res) => {
+    //Check the validation object for errors and if errors exist, return a JSON object as an HTTP response
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+    //Take the password input and hash it
+    let hashedPassword = Users.hashPassword(req.body.Password);
+
+    //Ensure the authorized user is the owner of the account to be updated
+    if(req.user.Username !== req.params.Username) {
         return res.status(400).send('Permission denied.');
     }
     await Users.findOneAndUpdate({ Username: req.params.Username },
         { $set: 
             {
                 Username: req.body.Username,
-                Password: req.body.Password,
+                Password: hashedPassword, //Store only hashed password for privacy
                 Email: req.body.Email,
                 BirthDate: req.body.Birth
             },
