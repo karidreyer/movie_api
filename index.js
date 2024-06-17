@@ -13,6 +13,7 @@ const express = require('express');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const uuid = require('uuid');
+const { check, validationResult } = require('express-validator');
 
 
 
@@ -85,8 +86,20 @@ app.get('/documentation', (req, res) => {
   Email: String, (required)
   Birthday: Date
 }*/
-app.post('/users', async (req, res) => {
-    let hashedPassword = Users.hashPassword(req.body.Password); //Take the password and hashes it
+app.post('/users', [
+    //Input validation via Express Validation
+    check('Username', 'Username is required.').isLength({min: 5}), //Check that username is not empty or too short
+    check('Username', 'Username can not contain non-alphanumeric characters.').isAlphanumeric(), //Check that username does not contain non-alphanumeric characters
+    check('Password', 'Password is required.').not().isEmpty(), //Check that password is not empty
+    check('Email', 'Email does not appear to be valid.').isEmail() //Check that email address is valid
+], async (req, res) => {
+    //Check the validation object for errors and if errors exist, return a JSON object as an HTTP response
+    let errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    let hashedPassword = Users.hashPassword(req.body.Password); //Take the password and hash it
     await Users.findOne({ Username: req.body.Username }) //First, search for the requested username to check if it already exists
     .then((user) => {
         if (user) {
