@@ -194,7 +194,7 @@ app.get('/movies/directors/:DirectorName', passport.authenticate('jwt', { sessio
     });
 });
 
-//(10)READ - Return a list of all Users
+//(10)READ - Return a list of all Users (ADMIN ONLY - Requires additional security)
 app.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Users.find()
     .then((users) => {
