@@ -195,7 +195,7 @@ app.get('/movies/directors/:DirectorName', passport.authenticate('jwt', { sessio
 });
 
 //(10)READ - Return a list of all Users
-app.get('/users', async (req, res) => {
+app.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Users.find()
     .then((users) => {
         res.status(201).json(users);
@@ -207,7 +207,10 @@ app.get('/users', async (req, res) => {
 });
 
 //(11)READ - Return information about a single user by Username
-app.get('/users/:Username', async (req, res) => {
+app.get('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be viewed
+        return res.status(400).send('Permission denied.');
+    }
     await Users.findOne({ Username: req.params.Username })
     .then((user) => {
         res.json(user);
