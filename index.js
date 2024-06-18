@@ -23,7 +23,12 @@ const app = express();
 
 
 //** Connect to MongoDB database **//
-mongoose.connect('mongodb://localhost:27017/cfDB');
+
+//Local database
+// mongoose.connect('mongodb://localhost:27017/cfDB');
+
+//Online database
+mongoose.connect('process.env.CONNECTION_URI');
 
 
 
