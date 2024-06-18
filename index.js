@@ -28,7 +28,7 @@ const app = express();
 // mongoose.connect('mongodb://localhost:27017/cfDB');
 
 //Online database
-mongoose.connect('process.env.CONNECTION_URI');
+mongoose.connect(process.env.CONNECTION_URI);
 
 
 
