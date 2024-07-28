@@ -49,7 +49,7 @@ app.use(morgan('common'));
 
 //Require CORS and restrict access to allowed origins
 const cors = require('cors');
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234/'];
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -152,7 +152,7 @@ app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { sess
 });
 
 //(1)READ - Return a list of all movies to the user ("/movies")
-app.get('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.get('/movies', async (req, res) => {
     await Movies.find()
     .then((movies) => {
         res.status(200).json(movies);
