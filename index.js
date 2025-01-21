@@ -1,4 +1,11 @@
-//** Importing required modules and models **//
+/**
+ * Main Express application for the MovieNest API.
+ * 
+ * @file index.js
+ * @module index
+ * @description This file configures the Express app, connects to MongoDB, 
+ * defines all API endpoints for movies and users, sets up authentication, and listens on a specified port.
+ */
 
 //Import Mongoose for MongoDB interactions
 const mongoose = require('mongoose');
@@ -22,7 +29,12 @@ const app = express();
 
 
 
-//** Connect to MongoDB database **//
+/**
+ * Connects to MongoDB.
+ * - If using a local DB, uncomment the local connect string.
+ * - Otherwise uses the online DB from `process.env.CONNECTION_URI`.
+ * @type {Mongoose.Connection}
+ */
 
 //Local database
 // mongoose.connect('mongodb://localhost:27017/cfDB');
@@ -49,7 +61,18 @@ app.use(morgan('common'));
 
 //Require CORS and restrict access to allowed origins
 const cors = require('cors');
-let allowedOrigins = ['http://localhost:8080', 'http://testsite.com', 'http://localhost:1234', 'https://movienest-app.netlify.app', 'http://localhost:4200', 'https://karidreyer.github.io'];
+
+/**
+ * Allowed origins array for CORS.
+ * @type {Array<string>}
+ */
+let allowedOrigins = [
+    'http://localhost:8080', 
+    'http://localhost:1234', 
+    'https://movienest-app.netlify.app', 
+    'http://localhost:4200', 
+    'https://karidreyer.github.io'
+];
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -73,24 +96,44 @@ require('./passport');
 
 //** Routes and handlers **//
 
-// Route to homepage ("/")
+/**
+ * GET root path ("/").
+ * Serves a simple welcome message.
+ * @name GET /
+ * @function
+ * @memberof module:index
+ * @returns {string} Welcome message
+ */
 app.get('/', (req, res) => {
     res.send('Welcome to Movie Nest!');
 });
 
-// Route to documentation page about the API ("/documentation")
+/**
+ * GET documentation ("/documentation").
+ * Serves a static HTML file describing the API endpoints.
+ * @name GET /documentation
+ * @function
+ * @memberof module:index
+ * @returns {file} documentation.html
+ */
 app.get('/documentation', (req, res) => {
     res.sendFile(__dirname + '/public/documentation.html');
 });
 
-//(5)CREATE - Allow new users to register ("/users")
-/* JSON data input is expected in this format
-{
-  Username: String, (required)
-  Password: String, (required)
-  Email: String, (required)
-  Birthday: Date
-}*/
+/**
+ * POST new user registration ("/users").
+ * Allows new users to register. Validates user inputs.
+ * @name POST /users
+ * @function
+ * @memberof module:index
+ * @param {string} req.body.Username - Username (required, min length 5)
+ * @param {string} req.body.Password - Password (required)
+ * @param {string} req.body.Email - Email (required, valid email format)
+ * @param {string} req.body.BirthDate - User's birthdate in YYYY-MM-DD
+ * @returns {object} 201 - JSON object of newly created user
+ * @returns {object} 400 - If username already exists
+ * @returns {object} 422 - If validation fails
+ */
 app.post('/users', [
     //Input validation via Express Validation
     check('Username', 'Username must be at least 5 characters long.').isLength({min: 5}), //Check that username is not empty or too short
@@ -132,7 +175,17 @@ app.post('/users', [
     });
 });
 
-//(7)CREATE - Allow users to add a movie to their list of favourites ("/users/[USERNAME]/[MOVIE ID]")
+/**
+ * POST add a movie to user’s favorites ("/users/:Username/movies/:MovieID").
+ * @name POST /users/:Username/movies/:MovieID
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.Username - The user's username
+ * @param {string} req.params.MovieID - The ID of the movie to add
+ * @description Requires JWT auth. Only the user who owns the account can update it.
+ * @returns {object} 200 - The updated user object with new favorite movie
+ * @returns {object} 400 - If permission is denied
+ */
 app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
     if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
         return res.status(400).send('Permission denied.');
@@ -151,7 +204,14 @@ app.post('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { sess
         });
 });
 
-//(1)READ - Return a list of all movies to the user ("/movies")
+/**
+ * GET all movies ("/movies").
+ * @name GET /movies
+ * @function
+ * @memberof module:index
+ * @description Returns an array of all movies in the database. Requires JWT auth.
+ * @returns {object[]} 200 - JSON array of movie objects
+ */
 app.get('/movies', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Movies.find()
     .then((movies) => {
@@ -163,7 +223,15 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), async (req,
     });
 });
 
-//(2)READ - Return data about a single movie by title to the user (description, genre, director, image URL, whether it’s featured or not) ("/movies/[MOVIE TITLE]")
+/**
+ * GET a single movie by title ("/movies/:Title").
+ * @name GET /movies/:Title
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.Title - Movie title
+ * @description Returns data about a single movie (e.g., description, genre, director).
+ * @returns {object} 200 - Movie object
+ */
 app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Movies.findOne({ Title: req.params.Title })
     .then((movie) => {
@@ -175,7 +243,15 @@ app.get('/movies/:Title', passport.authenticate('jwt', { session: false }), asyn
     });
 });
 
-//(3)READ - Return data about a genre (description) by name/title (e.g., “Thriller”) ("/movies/genres/[GENRE NAME]")
+/**
+ * GET genre by name ("/movies/genres/:GenreName").
+ * @name GET /movies/genres/:GenreName
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.GenreName - The name of the genre
+ * @description Returns genre data (name and description) for a given genre name.
+ * @returns {object} 200 - Genre object
+ */
 app.get('/movies/genres/:GenreName', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Movies.findOne({ "Genre.Name": req.params.GenreName })
     .then((movie) => {
@@ -187,7 +263,15 @@ app.get('/movies/genres/:GenreName', passport.authenticate('jwt', { session: fal
     });
 });
 
-//(4)READ - Return data about a director (bio, birth year, death year) by name ("/movies/directors/[DIRECTOR NAME]")
+/**
+ * GET director by name ("/movies/directors/:DirectorName").
+ * @name GET /movies/directors/:DirectorName
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.DirectorName - The director's name
+ * @description Returns director data (bio, birth, death) for the given director name.
+ * @returns {object} 200 - Director object
+ */
 app.get('/movies/directors/:DirectorName', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Movies.findOne({ "Director.Name": req.params.DirectorName })
     .then((movie) => {
@@ -199,7 +283,14 @@ app.get('/movies/directors/:DirectorName', passport.authenticate('jwt', { sessio
     });
 });
 
-//(10)READ - Return a list of all Users (ADMIN ONLY - Requires additional security)
+/**
+ * GET all users ("/users").
+ * @name GET /users
+ * @function
+ * @memberof module:index
+ * @description Returns an array of all users. Requires JWT auth.
+ * @returns {object[]} 201 - JSON array of user objects
+ */
 app.get('/users', passport.authenticate('jwt', { session: false }), async (req, res) => {
     await Users.find()
     .then((users) => {
@@ -211,7 +302,16 @@ app.get('/users', passport.authenticate('jwt', { session: false }), async (req, 
     });
 });
 
-//(11)READ - Return information about a single user by Username
+/**
+ * GET a single user by username ("/users/:Username").
+ * @name GET /users/:Username
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.Username - The user's username
+ * @description Returns data for a single user. Must match JWT user. 
+ * @returns {object} 200 - The user object
+ * @returns {object} 400 - If permission denied
+ */
 app.get('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
     if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be viewed
         return res.status(400).send('Permission denied.');
@@ -226,14 +326,21 @@ app.get('/users/:Username', passport.authenticate('jwt', { session: false }), as
     });
 });
 
-//(6)UPDATE - Allow users to update their user info (username, password, email, date of birth) ("/users/[USERNAME]")
-/* JSON data input is expected in this format
-{
-  Username: String, (required)
-  Password: String, (required)
-  Email: String, (required)
-  Birthday: Date
-}*/
+/**
+ * PUT update user info ("/users/:Username").
+ * @name PUT /users/:Username
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.Username - The user's existing username
+ * @param {string} req.body.Username - New username (required, min length 5)
+ * @param {string} req.body.Password - New password (required)
+ * @param {string} req.body.Email - New email (required)
+ * @param {Date} req.body.Birth - New birth date
+ * @description Updates user info. Must match JWT user. Validates user inputs.
+ * @returns {object} 200 - Updated user object
+ * @returns {object} 400 - Permission denied
+ * @returns {object} 422 - Validation fails
+ */
 app.put('/users/:Username', passport.authenticate('jwt', { session: false }), [
     //Input validation via Express Validation
     check('Username', 'Username must be at least 5 characters long.').isLength({min: 5}), //Check that username is not empty or too short
@@ -272,7 +379,17 @@ app.put('/users/:Username', passport.authenticate('jwt', { session: false }), [
         })
 });
 
-//(8)DELETE - Allow users to remove a movie from their list of favourites ("/users/[USERNAME]/[MOVIE ID]")
+/**
+ * DELETE remove a movie from user’s favorites ("/users/:Username/movies/:MovieID").
+ * @name DELETE /users/:Username/movies/:MovieID
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.Username - The user's username
+ * @param {string} req.params.MovieID - The movie ID to remove
+ * @description Removes a specified MovieID from the user's favorites array. Must match JWT user.
+ * @returns {object} 200 - Updated user object
+ * @returns {object} 400 - Permission denied
+ */
 app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { session: false }), async (req, res) => {
     if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
         return res.status(400).send('Permission denied.');
@@ -291,7 +408,16 @@ app.delete('/users/:Username/movies/:MovieID', passport.authenticate('jwt', { se
         });
 });
 
-//(9)DELETE - Allow existing users to deregister 
+/**
+ * DELETE deregister a user ("/users/:Username").
+ * @name DELETE /users/:Username
+ * @function
+ * @memberof module:index
+ * @param {string} req.params.Username - The user's username to delete
+ * @description Permanently removes a user’s account. Must match JWT user.
+ * @returns {string} 200 - Confirmation message
+ * @returns {string} 400 - If user not found or permission denied
+ */
 app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), async (req, res) => {
     if(req.user.Username !== req.params.Username) { //Ensure the authorized user is the owner of the account to be updated
         return res.status(400).send('Permission denied.');
@@ -312,7 +438,14 @@ app.delete('/users/:Username', passport.authenticate('jwt', { session: false }),
 
 
 
-//** Handling Errors **//
+/**
+ * Express error handling middleware.
+ * Logs the error stack and sends a 500 status.
+ * @name ErrorHandler
+ * @function
+ * @memberof module:index
+ * @param {object} err - The error object
+ */
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).send('Something broke!');
@@ -320,7 +453,13 @@ app.use((err, req, res, next) => {
 
 
 
-//** Setting the application to listen on a specific port **//
+/**
+ * Starts the server on the specified port.
+ * @name listen
+ * @function
+ * @memberof module:index
+ * @param {number} port - The port the server will listen on
+ */
 const port = process.env.PORT || 8080;
 app.listen(port, '0.0.0.0', () => {
     console.log('Listening on Port ' + port + '.');
