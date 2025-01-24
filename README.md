@@ -26,7 +26,7 @@ The MovieNest API is designed to provide users with comprehensive access to info
 * [ExpressJS](https://www.expresjs.org/) This is a NodeJS web application framework.
 * [MongoDB](https://www.mongodb.com/) This is a free open source NOSQL document database with scalability and flexibility. Data are stored in flexible documents with JSON data.
 * [Mongoose](https://mongoosejs.com/) This makes it easy to write MongoDB validation by providing a straight-forward, schema-based solution to model to application data.
-* [Heroku] (https://www.heroku.com/) The API was deployed via Heroku, enabling cloud hosting and continuous deployment.
+* [Heroku](https://www.heroku.com/) The API was deployed via Heroku, enabling cloud hosting and continuous deployment.
 
 ### Authors
 * [Kari Dreyer](https://github.com/karidreyer)
